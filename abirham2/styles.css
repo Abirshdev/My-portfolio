@@ -183,9 +183,15 @@ body {
     border: 2px solid white;
 }
 
-.btn-secondary:hover {
-    background: white;
-    color: var(--primary-color);
+.btn-cv {
+    background: #fbbf24;
+    color: #1f2937;
+}
+
+.btn-cv:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: #f59e0b;
 }
 
 /* Sections */
@@ -288,6 +294,8 @@ section {
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s;
+    margin-right: 1rem;
+    display: inline-block;
 }
 
 .project-link:hover {
