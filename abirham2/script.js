@@ -38,20 +38,35 @@ window.addEventListener('scroll', () => {
 });
 
 // Form submission handler
+emailjs.init('n35q6FRexeFjbhj-7');
+
 const contactForm = document.querySelector('.contact-form');
 contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    
-    // Here you would typically send the form data to a backend service
-    // For now, we'll just show an alert
-    alert(`Thank you, ${name}! Your message has been received. I'll get back to you at ${email} soon.`);
-    
-    // Reset form
-    contactForm.reset();
+
+    const btn = document.getElementById('submit-btn');
+    const status = document.getElementById('form-status');
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    status.style.color = '';
+    status.textContent = '';
+
+    emailjs.sendForm('service_vbuab2j', 'template_673ncz9', contactForm)
+        .then(() => {
+            status.style.color = 'green';
+            status.textContent = 'Message sent successfully!';
+            contactForm.reset();
+        })
+        .catch((error) => {
+            status.style.color = 'red';
+            status.textContent = 'Failed to send. Please try again.';
+            console.error('EmailJS error:', error);
+        })
+        .finally(() => {
+            btn.textContent = 'Send Message';
+            btn.disabled = false;
+        });
 });
 
 // Intersection Observer for fade-in animations

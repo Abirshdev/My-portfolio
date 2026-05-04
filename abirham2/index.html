@@ -6,6 +6,7 @@
     <meta name="description" content="Professional Portfolio Website">
     <title>Portfolio - Your Name</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -188,17 +189,18 @@
             <h2 class="section-title">Get In Touch</h2>
             <div class="contact-content">
                 <p class="contact-description">I'm always open to new opportunities and collaborations. Feel free to reach out!</p>
-                <form class="contact-form">
+                <form class="contact-form" id="contact-form">
                     <div class="form-group">
-                        <input type="text" id="name" placeholder="Your Name" required>
+                        <input type="text" id="name" name="name" placeholder="Your Name" required>
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" placeholder="Your Email" required>
+                        <input type="email" id="email" name="email" placeholder="Your Email" required>
                     </div>
                     <div class="form-group">
-                        <textarea id="message" rows="5" placeholder="Your Message" required></textarea>
+                        <textarea id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send Message</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Send Message</button>
+                    <p id="form-status" style="margin-top:1rem;text-align:center;font-weight:500;"></p>
                 </form>
                 <div class="social-links">
                     <a href="https://github.com/Abirshdev" aria-label="GitHub">GitHub</a>
