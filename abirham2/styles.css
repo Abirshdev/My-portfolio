@@ -543,18 +543,46 @@ section {
 .social-links {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.25rem;
+    margin-top: 1rem;
 }
 
 .social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
     color: var(--text-primary);
+    transition: background 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s;
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s;
+}
+
+.social-links a svg {
+    width: 22px;
+    height: 22px;
 }
 
 .social-links a:hover {
-    color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+}
+
+.social-links a[aria-label="GitHub"]:hover {
+    background: #1f2937;
+    color: white;
+}
+
+.social-links a[aria-label="LinkedIn"]:hover {
+    background: #0077b5;
+    color: white;
+}
+
+.social-links a[aria-label="Telegram"]:hover {
+    background: #229ed9;
+    color: white;
 }
 
 /* Footer */
