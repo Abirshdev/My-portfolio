@@ -84,26 +84,42 @@
     /* ════════════════════════════════════════
        MOBILE MENU
     ════════════════════════════════════════ */
-    var menuBtn = document.getElementById('mobileMenuToggle');
-    var navList = document.getElementById('navLinks');
+    var menuBtn  = document.getElementById('mobileMenuToggle');
+    var navList  = document.getElementById('navLinks');
+    var overlay  = document.getElementById('navOverlay');
+
+    function openMenu() {
+        navList.classList.add('open');
+        menuBtn.classList.add('open');
+        menuBtn.setAttribute('aria-expanded', 'true');
+        if (overlay) { overlay.classList.add('visible'); }
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        navList.classList.remove('open');
+        menuBtn.classList.remove('open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+        if (overlay) { overlay.classList.remove('visible'); }
+        document.body.style.overflow = '';
+    }
 
     menuBtn && menuBtn.addEventListener('click', function () {
-        var open = navList.classList.toggle('open');
-        menuBtn.classList.toggle('open', open);
-        menuBtn.setAttribute('aria-expanded', String(open));
+        navList.classList.contains('open') ? closeMenu() : openMenu();
     });
 
+    /* close when a nav link is clicked */
     document.querySelectorAll('.nav-link').forEach(function (link) {
-        link.addEventListener('click', function () {
-            navList.classList.remove('open');
-            if (menuBtn) menuBtn.classList.remove('open');
-        });
+        link.addEventListener('click', closeMenu);
     });
 
+    /* close when overlay is clicked */
+    overlay && overlay.addEventListener('click', closeMenu);
+
+    /* close on outside click */
     document.addEventListener('click', function (e) {
-        if (navbar && !navbar.contains(e.target)) {
-            navList.classList.remove('open');
-            if (menuBtn) menuBtn.classList.remove('open');
+        if (navbar && !navbar.contains(e.target) && navList.classList.contains('open')) {
+            closeMenu();
         }
     });
 
