@@ -371,17 +371,214 @@ section { padding: 5rem 0; }
 }
 
 /* ============================================
-   REVEAL ANIMATIONS
+   REVEAL ANIMATIONS — 3D perspective slide-in
    ============================================ */
 .reveal {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
+    transform: perspective(800px) translateY(40px) rotateX(8deg);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-origin: center top;
 }
 
 .reveal.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: perspective(800px) translateY(0) rotateX(0deg);
+}
+
+/* ============================================
+   3D FLOATING SHAPES — hero background
+   ============================================ */
+@keyframes float3d-1 {
+    0%   { transform: translateY(0)    rotateX(0deg)   rotateY(0deg)   rotateZ(0deg); }
+    33%  { transform: translateY(-22px) rotateX(20deg)  rotateY(30deg)  rotateZ(5deg); }
+    66%  { transform: translateY(-10px) rotateX(-10deg) rotateY(60deg)  rotateZ(-5deg); }
+    100% { transform: translateY(0)    rotateX(0deg)   rotateY(0deg)   rotateZ(0deg); }
+}
+@keyframes float3d-2 {
+    0%   { transform: translateY(0)     rotateX(0deg)   rotateY(0deg)   scale(1); }
+    50%  { transform: translateY(-18px) rotateX(-15deg) rotateY(-40deg) scale(1.05); }
+    100% { transform: translateY(0)     rotateX(0deg)   rotateY(0deg)   scale(1); }
+}
+@keyframes float3d-3 {
+    0%   { transform: translateX(0)    rotateX(0deg)  rotateZ(0deg); }
+    40%  { transform: translateX(-14px) rotateX(25deg) rotateZ(15deg); }
+    80%  { transform: translateX(8px)  rotateX(-10deg) rotateZ(-8deg); }
+    100% { transform: translateX(0)    rotateX(0deg)  rotateZ(0deg); }
+}
+
+.shape { transform-style: preserve-3d; }
+.shape-1 { animation: float3d-1 9s ease-in-out infinite; }
+.shape-2 { animation: float3d-2 7s ease-in-out infinite; }
+.shape-3 { animation: float3d-3 11s ease-in-out infinite; }
+
+/* ============================================
+   3D ROTATING TECH CUBE — hero decoration
+   ============================================ */
+.tech-cube-wrap {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    perspective: 600px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tech-cube {
+    width: 80px;
+    height: 80px;
+    transform-style: preserve-3d;
+    animation: rotateCube 10s linear infinite;
+    position: relative;
+}
+
+@keyframes rotateCube {
+    0%   { transform: rotateX(0deg)   rotateY(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+.cube-face {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgba(134,239,172,0.4);
+    background: rgba(22,163,74,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    border-radius: 8px;
+    backdrop-filter: blur(2px);
+    color: rgba(134,239,172,0.8);
+}
+
+.cube-face.front  { transform: translateZ(40px); }
+.cube-face.back   { transform: translateZ(-40px) rotateY(180deg); }
+.cube-face.left   { transform: translateX(-40px) rotateY(-90deg); }
+.cube-face.right  { transform: translateX(40px)  rotateY(90deg); }
+.cube-face.top    { transform: translateY(-40px) rotateX(90deg); }
+.cube-face.bottom { transform: translateY(40px)  rotateX(-90deg); }
+
+/* ============================================
+   3D PROFILE CARD TILT — hero
+   ============================================ */
+.profile-image-container {
+    transition: transform 0.1s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+/* ============================================
+   3D PROJECT CARD TILT
+   ============================================ */
+.project-card {
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.15s ease, box-shadow var(--transition);
+}
+
+.project-card .project-image,
+.project-card .project-info {
+    transform-style: preserve-3d;
+}
+
+/* 3D lift glow on hover — enhanced */
+.project-card:hover {
+    box-shadow: var(--shadow-lg),
+                0 20px 60px rgba(22,163,74,0.18),
+                0 0 0 1px rgba(22,163,74,0.15);
+}
+
+/* ============================================
+   3D SKILL CARD FLIP
+   ============================================ */
+.skill-card {
+    transform-style: preserve-3d;
+    perspective: 600px;
+    transition: transform 0.45s cubic-bezier(0.23,1,0.32,1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-8px) rotateY(8deg) rotateX(-4deg);
+    box-shadow: 6px 12px 28px rgba(22,163,74,0.22);
+}
+
+/* ============================================
+   3D TESTIMONIAL CARD TILT
+   ============================================ */
+.testimonial-card {
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.2s ease, box-shadow var(--transition), border-color var(--transition);
+}
+
+.testimonial-card:hover {
+    transform: perspective(600px) translateY(-6px) rotateX(3deg);
+    box-shadow: 0 24px 48px rgba(22,163,74,0.18);
+}
+
+/* ============================================
+   3D STAT NUMBER FLIP
+   ============================================ */
+.stat-num {
+    display: inline-block;
+    animation: statPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    transform-origin: center bottom;
+}
+
+@keyframes statPop {
+    0%   { transform: perspective(200px) rotateX(-90deg) scale(0.5); opacity: 0; }
+    60%  { transform: perspective(200px) rotateX(8deg)   scale(1.05); opacity: 1; }
+    100% { transform: perspective(200px) rotateX(0deg)   scale(1); opacity: 1; }
+}
+
+/* ============================================
+   3D ABOUT IMAGE
+   ============================================ */
+.about-img {
+    transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+    transform-style: preserve-3d;
+}
+
+.about-image-wrap:hover .about-img {
+    transform: perspective(800px) rotateY(-6deg) rotateX(3deg) scale(1.02);
+}
+
+.about-image-wrap:hover .about-img-badge {
+    transform: perspective(800px) translateZ(20px) scale(1.05);
+}
+
+.about-img-badge {
+    transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+}
+
+/* ============================================
+   3D BLOG CARD
+   ============================================ */
+.blog-card {
+    transform-style: preserve-3d;
+    transition: transform 0.3s cubic-bezier(0.23,1,0.32,1),
+                box-shadow var(--transition),
+                border-color var(--transition);
+}
+
+.blog-card:hover {
+    transform: perspective(700px) translateY(-8px) rotateX(4deg);
+    box-shadow: 0 24px 48px rgba(22,163,74,0.15);
+}
+
+/* ============================================
+   3D BUTTON PRESS
+   ============================================ */
+.btn {
+    transform-style: preserve-3d;
+}
+
+.btn:active {
+    transform: translateY(2px) scale(0.97);
+    transition: transform 0.08s ease;
 }
 
 /* ============================================

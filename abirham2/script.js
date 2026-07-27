@@ -243,6 +243,80 @@
     });
 
     /* ════════════════════════════════════════
+       3D MOUSE TILT — project cards
+    ════════════════════════════════════════ */
+    function add3DTilt(selector, strength) {
+        strength = strength || 15;
+        document.querySelectorAll(selector).forEach(function (el) {
+            el.addEventListener('mousemove', function (e) {
+                var rect   = el.getBoundingClientRect();
+                var cx     = rect.left + rect.width  / 2;
+                var cy     = rect.top  + rect.height / 2;
+                var dx     = (e.clientX - cx) / (rect.width  / 2);
+                var dy     = (e.clientY - cy) / (rect.height / 2);
+                var rotY   =  dx * strength;
+                var rotX   = -dy * strength;
+                el.style.transform = 'perspective(800px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) translateZ(8px)';
+            });
+            el.addEventListener('mouseleave', function () {
+                el.style.transform = '';
+                el.style.transition = 'transform 0.5s cubic-bezier(0.23,1,0.32,1)';
+                setTimeout(function () { el.style.transition = ''; }, 500);
+            });
+        });
+    }
+
+    add3DTilt('.project-card',     10);
+    add3DTilt('.testimonial-card', 8);
+    add3DTilt('.blog-card',        8);
+    add3DTilt('.skill-card',       12);
+
+    /* ════════════════════════════════════════
+       3D PROFILE IMAGE TILT — hero
+    ════════════════════════════════════════ */
+    var profileWrap = document.querySelector('.profile-image-container');
+    if (profileWrap) {
+        profileWrap.addEventListener('mousemove', function (e) {
+            var rect = profileWrap.getBoundingClientRect();
+            var cx   = rect.left + rect.width  / 2;
+            var cy   = rect.top  + rect.height / 2;
+            var dx   = (e.clientX - cx) / (rect.width  / 2);
+            var dy   = (e.clientY - cy) / (rect.height / 2);
+            profileWrap.style.transform = 'perspective(600px) rotateX(' + (-dy * 12) + 'deg) rotateY(' + (dx * 12) + 'deg) scale(1.04)';
+        });
+        profileWrap.addEventListener('mouseleave', function () {
+            profileWrap.style.transform = '';
+            profileWrap.style.transition = 'transform 0.6s cubic-bezier(0.23,1,0.32,1)';
+            setTimeout(function () { profileWrap.style.transition = ''; }, 600);
+        });
+    }
+
+    /* ════════════════════════════════════════
+       3D STAT NUMBER ANIMATION on scroll
+    ════════════════════════════════════════ */
+    if ('IntersectionObserver' in window) {
+        var statObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('.stat-num').forEach(function (el, i) {
+                        el.style.animationDelay = (i * 150) + 'ms';
+                        el.style.animationPlayState = 'running';
+                    });
+                    statObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        var heroStats = document.querySelector('.hero-stats');
+        if (heroStats) {
+            heroStats.querySelectorAll('.stat-num').forEach(function (el) {
+                el.style.animationPlayState = 'paused';
+            });
+            statObserver.observe(heroStats);
+        }
+    }
+
+    /* ════════════════════════════════════════
        CONTACT FORM — EmailJS + local storage
     ════════════════════════════════════════ */
     if (typeof emailjs !== 'undefined') {
