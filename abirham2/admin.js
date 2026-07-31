@@ -15,11 +15,14 @@
         authToken : 'adm_token',
         password  : 'adm_password',
         projects  : 'adm_projects',
-        settings  : 'adm_settings'
+        settings  : 'adm_settings',
+        photo     : 'pf_profile_photo',
+        favicon   : 'pf_favicon'
     };
 
     var DEFAULT_USER = 'admin';
     var DEFAULT_PASS = btoa('admin123');
+    var DEFAULT_FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2316a34a'/%3E%3Ctext x='32' y='44' font-family='Arial,Helvetica,sans-serif' font-size='30' font-weight='bold' fill='%23fff' text-anchor='middle'%3EAD%3C/text%3E%3C/svg%3E";
 
     function load(key, fallback) {
         try {
@@ -540,6 +543,7 @@
         if ($('sRole'))   $('sRole').value   = s.role   || 'Full Stack Developer';
         if ($('sEmail'))  $('sEmail').value  = s.email  || '';
         if ($('sGithub')) $('sGithub').value = s.github || 'https://github.com/Abirshdev';
+        loadBranding();
     }
 
     var infoForm = $('infoForm');
@@ -592,6 +596,100 @@
             setTimeout(function () { msg.textContent = ''; }, 3000);
             showToast('Password changed.');
         });
+    }
+
+    /* ════════════════════════════════════════
+       BRANDING — profile photo & favicon
+    ════════════════════════════════════════ */
+    function readImage(file, maxSize, mime, quality, key, previewEl) {
+        if (!file) return;
+        if (!/^image\//.test(file.type)) {
+            showToast('Please choose an image file.', 'err');
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+                var canvas = document.createElement('canvas');
+                var scale  = Math.min(1, maxSize / Math.max(img.width, img.height));
+                canvas.width  = Math.max(1, Math.round(img.width * scale));
+                canvas.height = Math.max(1, Math.round(img.height * scale));
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                var dataUrl = canvas.toDataURL(mime, quality);
+                try {
+                    localStorage.setItem(key, dataUrl);
+                } catch (err2) {
+                    showToast('Image too large to save. Try a smaller file.', 'err');
+                    return;
+                }
+                if (previewEl) previewEl.src = dataUrl;
+                var msg = $('brandMsg');
+                if (msg) {
+                    msg.textContent = 'Saved. The site will use this image.';
+                    msg.className   = 'settings-msg ok';
+                }
+                showToast('Image saved.');
+            };
+            img.onerror = function () { showToast('Could not read this image.', 'err'); };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    var photoUpload = $('photoUpload');
+    if (photoUpload) {
+        photoUpload.addEventListener('change', function () {
+            readImage(this.files[0], 600, 'image/jpeg', 0.85, KEYS.photo, $('photoPreview'));
+            this.value = '';
+        });
+    }
+
+    var faviconUpload = $('faviconUpload');
+    if (faviconUpload) {
+        faviconUpload.addEventListener('change', function () {
+            readImage(this.files[0], 128, 'image/png', 1, KEYS.favicon, $('faviconPreview'));
+            this.value = '';
+        });
+    }
+
+    var resetPhotoBtn = $('resetPhotoBtn');
+    if (resetPhotoBtn) {
+        resetPhotoBtn.addEventListener('click', function () {
+            localStorage.removeItem(KEYS.photo);
+            if ($('photoPreview')) $('photoPreview').src = 'profile.jpg';
+            var msg = $('brandMsg');
+            if (msg) {
+                msg.textContent = 'Profile photo reset to default.';
+                msg.className   = 'settings-msg ok';
+            }
+            showToast('Profile photo reset.');
+        });
+    }
+
+    var resetFaviconBtn = $('resetFaviconBtn');
+    if (resetFaviconBtn) {
+        resetFaviconBtn.addEventListener('click', function () {
+            localStorage.removeItem(KEYS.favicon);
+            if ($('faviconPreview')) $('faviconPreview').src = DEFAULT_FAVICON;
+            var msg = $('brandMsg');
+            if (msg) {
+                msg.textContent = 'Favicon reset to default.';
+                msg.className   = 'settings-msg ok';
+            }
+            showToast('Favicon reset.');
+        });
+    }
+
+    function loadBranding() {
+        var photo = localStorage.getItem(KEYS.photo);
+        if ($('photoPreview'))    $('photoPreview').src    = photo || 'profile.jpg';
+        if ($('faviconPreview'))  $('faviconPreview').src  = localStorage.getItem(KEYS.favicon) || DEFAULT_FAVICON;
+        if ($('adminAvatar')) {
+            $('adminAvatar').style.backgroundImage = photo ? 'url(' + photo + ')' : '';
+            $('adminAvatar').style.backgroundSize  = photo ? 'cover' : '';
+            $('adminAvatar').style.backgroundPosition = photo ? 'center' : '';
+        }
     }
 
     /* ════════════════════════════════════════

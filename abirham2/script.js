@@ -30,6 +30,26 @@
     });
 
     /* ════════════════════════════════════════
+       BRANDING — custom profile photo & favicon
+    ════════════════════════════════════════ */
+    try {
+        var customPhoto = localStorage.getItem('pf_profile_photo');
+        if (customPhoto) {
+            document.querySelectorAll('.profile-image, .about-img').forEach(function (img) {
+                img.src = customPhoto;
+            });
+        }
+    } catch (e) {}
+
+    try {
+        var customFavicon = localStorage.getItem('pf_favicon');
+        if (customFavicon) {
+            var iconLink = document.querySelector('link[rel="icon"]');
+            if (iconLink) iconLink.href = customFavicon;
+        }
+    } catch (e) {}
+
+    /* ════════════════════════════════════════
        NAVBAR — scroll shadow + active link
     ════════════════════════════════════════ */
     var navbar   = document.getElementById('navbar');

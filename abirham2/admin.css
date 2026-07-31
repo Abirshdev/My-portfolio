@@ -714,6 +714,64 @@ textarea { resize: vertical; }
 
 .danger-card { border-color: #fca5a5; }
 
+/* ── Branding (profile photo / favicon) ── */
+.branding-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.branding-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.branding-preview {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid var(--border-g);
+    overflow: hidden;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.branding-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.favicon-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+}
+
+.favicon-preview img { border-radius: var(--radius-sm); }
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--p);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.upload-btn:hover { background: var(--p-dark); transform: translateY(-1px); }
+.upload-btn svg { width: 14px; height: 14px; }
+
 /* ════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════ */
