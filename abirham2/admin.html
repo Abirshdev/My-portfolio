@@ -78,6 +78,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
                 Settings
             </button>
+            <button class="nav-item" data-panel="users">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Users
+            </button>
         </nav>
         <div class="sidebar-footer">
             <button class="btn-logout" id="logoutBtn">
@@ -104,7 +108,13 @@
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
                     <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
-                <div class="admin-avatar" id="adminAvatar">A</div>
+                <div class="topbar-user">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="topbar-user-meta">
+                        <strong id="topbarUserName">admin</strong>
+                        <span class="role-badge" id="topbarRole">Super Admin</span>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -157,11 +167,24 @@
                     </table>
                 </div>
                 <div class="table-card">
+                    <h4>Sections Viewed</h4>
+                    <table class="data-table" id="sectionViewsTable">
+                        <thead><tr><th>Section</th><th>Visitors</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tables-row">
+                <div class="table-card">
                     <h4>Traffic Sources</h4>
                     <table class="data-table" id="referrerTable">
                         <thead><tr><th>Source</th><th>Visits</th></tr></thead>
                         <tbody></tbody>
                     </table>
+                </div>
+                <div class="table-card">
+                    <h4>Recent Visitor Journeys</h4>
+                    <div class="journeys-list" id="journeysList"></div>
                 </div>
             </div>
         </section>
@@ -214,6 +237,36 @@
                 </form>
             </div>
             <div class="projects-admin-list" id="projectsAdminList"></div>
+        </section>
+
+        <!-- ── USERS PANEL ── -->
+        <section class="panel" id="panel-users">
+            <div class="panel-header">
+                <h3>User Management</h3>
+                <button class="btn-sm btn-primary" id="addUserBtn">+ Add User</button>
+            </div>
+            <div class="project-form-wrap" id="userFormWrap" style="display:none">
+                <form class="project-form" id="userForm">
+                    <h4 id="userFormTitle">Add New User</h4>
+                    <div class="form-row-2">
+                        <div class="field-group"><label>Username *</label><input type="text" id="uName" required placeholder="admin"></div>
+                        <div class="field-group"><label>Password *</label><input type="text" id="uPass" required minlength="6" placeholder="min 6 characters"></div>
+                    </div>
+                    <div class="field-group"><label>Role</label>
+                        <select id="uRole">
+                            <option value="superadmin">Super Admin — full access incl. users</option>
+                            <option value="admin">Admin — full access</option>
+                            <option value="viewer">Viewer — analytics &amp; messages only</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-sm btn-primary" id="saveUserBtn">Save User</button>
+                        <button type="button" class="btn-sm btn-outline" id="cancelUserBtn">Cancel</button>
+                    </div>
+                    <input type="hidden" id="uEditName">
+                </form>
+            </div>
+            <div class="users-admin-list" id="usersAdminList"></div>
         </section>
 
         <!-- ── SETTINGS PANEL ── -->

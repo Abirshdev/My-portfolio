@@ -74,10 +74,18 @@ Open `http://localhost:8000` in your browser.
 
 Visit `admin.html` to access the dashboard.
 
-- **Default credentials:** `admin` / `admin123`
-- Manage analytics, read contact messages, add/edit/delete projects, and change your password from the **Settings** tab.
+- **Default credentials:** `admin` / `admin123` (Super Admin)
+- Manage analytics (incl. **Sections Viewed** and **Visitor Journeys**), read contact messages, add/edit/delete projects, change branding (profile photo & favicon), and manage accounts from the **Users** tab.
 
-> ⚠️ Change the default password after your first login. Analytics data is stored per-browser in `localStorage`.
+### Roles
+
+| Role         | Access                                                   |
+| ------------ | -------------------------------------------------------- |
+| Super Admin  | Everything, including user management                    |
+| Admin        | Everything except user management                        |
+| Viewer       | Read-only analytics & messages                           |
+
+> ⚠️ Change the default password after your first login and use the **Users** tab to add your team. Analytics data is stored per-browser in `localStorage`.
 
 ## Contact
 

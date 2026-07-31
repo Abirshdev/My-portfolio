@@ -12,17 +12,50 @@
        HELPERS
     ════════════════════════════════════════ */
     var KEYS = {
-        authToken : 'adm_token',
-        password  : 'adm_password',
-        projects  : 'adm_projects',
-        settings  : 'adm_settings',
-        photo     : 'pf_profile_photo',
-        favicon   : 'pf_favicon'
+        authToken  : 'adm_token',
+        password   : 'adm_password',
+        projects   : 'adm_projects',
+        settings   : 'adm_settings',
+        photo      : 'pf_profile_photo',
+        favicon    : 'pf_favicon',
+        users      : 'adm_users',
+        currentUser: 'adm_current_user'
     };
 
     var DEFAULT_USER = 'admin';
     var DEFAULT_PASS = btoa('admin123');
     var DEFAULT_FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2316a34a'/%3E%3Ctext x='32' y='44' font-family='Arial,Helvetica,sans-serif' font-size='30' font-weight='bold' fill='%23fff' text-anchor='middle'%3EAD%3C/text%3E%3C/svg%3E";
+
+    /* role → which panels the user may open */
+    var ROLES = {
+        superadmin: { label: 'Super Admin', panels: ['analytics', 'messages', 'projects', 'settings', 'users'] },
+        admin:      { label: 'Admin',       panels: ['analytics', 'messages', 'projects', 'settings'] },
+        viewer:     { label: 'Viewer',      panels: ['analytics', 'messages'] }
+    };
+
+    function getUsers() {
+        var users = load(KEYS.users, null);
+        if (!users || !users.length) {
+            /* migrate legacy single-password setup into a superadmin user */
+            users = [{ user: DEFAULT_USER, pass: load(KEYS.password, DEFAULT_PASS), role: 'superadmin', created: Date.now() }];
+            save(KEYS.users, users);
+        }
+        return users;
+    }
+    function saveUsers(arr) { save(KEYS.users, arr); }
+
+    function getCurrentUser() {
+        var name  = load(KEYS.currentUser, DEFAULT_USER);
+        var users = getUsers();
+        return users.filter(function (u) { return u.user === name; })[0] || users[0];
+    }
+    function getRole() {
+        var u = getCurrentUser();
+        return (u && ROLES[u.role]) ? u.role : 'superadmin';
+    }
+    function canManage() {
+        return getRole() !== 'viewer';
+    }
 
     function load(key, fallback) {
         try {
@@ -107,9 +140,10 @@
     }
 
     function login(user, pass) {
-        var storedPass = load(KEYS.password, DEFAULT_PASS);
-        if (user.trim() === DEFAULT_USER && btoa(pass) === storedPass) {
+        var match = getUsers().filter(function (u) { return u.user === user.trim(); })[0];
+        if (match && btoa(pass) === match.pass) {
             save(KEYS.authToken, 'valid_session');
+            save(KEYS.currentUser, match.user);
             return true;
         }
         return false;
@@ -117,6 +151,7 @@
 
     function logout() {
         localStorage.removeItem(KEYS.authToken);
+        localStorage.removeItem(KEYS.currentUser);
         showLoginScreen();
     }
 
@@ -128,7 +163,36 @@
     function showDashboard() {
         $('loginScreen').style.display = 'none';
         $('dashboard').style.display   = 'flex';
+        applyPermissions();
         refreshAll();
+    }
+
+    /* show only the nav items the current role is allowed to see */
+    function applyPermissions() {
+        var u      = getCurrentUser();
+        var panels = (u && ROLES[u.role]) ? ROLES[u.role].panels : ROLES.viewer.panels;
+
+        document.querySelectorAll('.nav-item[data-panel]').forEach(function (btn) {
+            var allowed = panels.indexOf(btn.dataset.panel) > -1;
+            btn.style.display = allowed ? '' : 'none';
+        });
+
+        var active  = document.querySelector('.nav-item[data-panel].active');
+        var allowed = active && panels.indexOf(active.dataset.panel) > -1;
+        if (!allowed) {
+            var first = null;
+            document.querySelectorAll('.nav-item[data-panel]').forEach(function (btn) {
+                if (!first && btn.style.display !== 'none') first = btn;
+            });
+            if (first) first.click();
+        }
+
+        if ($('topbarUserName')) $('topbarUserName').textContent = u ? u.user : DEFAULT_USER;
+        if ($('topbarRole'))     $('topbarRole').textContent     = (u && ROLES[u.role]) ? ROLES[u.role].label : 'Super Admin';
+
+        var manage = canManage();
+        if ($('markAllReadBtn'))  $('markAllReadBtn').style.display  = manage ? '' : 'none';
+        if ($('clearMessagesBtn'))$('clearMessagesBtn').style.display = manage ? '' : 'none';
     }
 
     /* toggle password visibility */
@@ -211,6 +275,7 @@
             if (btn.dataset.panel === 'analytics') renderAnalytics();
             if (btn.dataset.panel === 'messages')  renderMessages();
             if (btn.dataset.panel === 'projects')  renderProjects();
+            if (btn.dataset.panel === 'users')     renderUsers();
         });
     });
 
@@ -234,7 +299,9 @@
         renderBarChart(s.last7Days || []);
         renderProjectClicks(s.projectClicks || {});
         renderTable('sectionTable', s.sectionTime || {}, 's');
+        renderTable('sectionViewsTable', s.sectionViews || {});
         renderReferrers(s.referrers || {});
+        renderJourneys(s.journeys || []);
     }
 
     function renderBarChart(days) {
@@ -314,6 +381,29 @@
         }).join('');
     }
 
+    function renderJourneys(journeys) {
+        var el = $('journeysList');
+        if (!el) return;
+        if (!journeys.length) {
+            el.innerHTML = '<p style="color:var(--text-3);font-size:.85rem">No visitor journeys yet.</p>';
+            return;
+        }
+        el.innerHTML = journeys.map(function (j) {
+            var path = j.path.length
+                ? j.path.map(function (s) {
+                    return '<span class="journey-stop">' + escHtml(s) + '</span>';
+                }).join('<span class="journey-arrow">→</span>')
+                : '<span style="color:var(--text-3)">Home only</span>';
+            return '<div class="journey-card">'
+                + '<div class="journey-meta">'
+                + '<span class="journey-time">' + formatDate(j.ts) + '</span>'
+                + '<span class="journey-ref">' + escHtml(j.ref) + '</span>'
+                + '</div>'
+                + '<div class="journey-path">' + path + '</div>'
+                + '</div>';
+        }).join('');
+    }
+
     var resetAnalyticsBtn = $('resetAnalyticsBtn');
     if (resetAnalyticsBtn) {
         resetAnalyticsBtn.addEventListener('click', function () {
@@ -368,14 +458,17 @@
                 + '</div></div>'
                 + (msg.subject ? '<div class="message-subject">' + escHtml(msg.subject) + '</div>' : '')
                 + '<div class="message-body">' + escHtml(msg.message || '') + '</div>'
-                + '<div class="message-actions">'
-                + '<button class="btn-sm btn-icon btn-read" data-action="read" data-id="' + msg.id + '" title="' + (msg.read ? 'Mark Unread' : 'Mark Read') + '">'
-                + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
-                + (msg.read ? '<path d="M3 12l5 5L20 7"/>' : '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>')
-                + '</svg></button>'
-                + '<button class="btn-sm btn-icon btn-delete" data-action="delete" data-id="' + msg.id + '" title="Delete">'
-                + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>'
-                + '</button></div></div>';
+                + (canManage()
+                    ? '<div class="message-actions">'
+                    + '<button class="btn-sm btn-icon btn-read" data-action="read" data-id="' + msg.id + '" title="' + (msg.read ? 'Mark Unread' : 'Mark Read') + '">'
+                    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
+                    + (msg.read ? '<path d="M3 12l5 5L20 7"/>' : '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>')
+                    + '</svg></button>'
+                    + '<button class="btn-sm btn-icon btn-delete" data-action="delete" data-id="' + msg.id + '" title="Delete">'
+                    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>'
+                    + '</button></div>'
+                    : '')
+                + '</div>';
         }).join('');
 
         /* use one-time delegation to avoid duplicate listeners */
@@ -535,6 +628,131 @@
     }
 
     /* ════════════════════════════════════════
+       USERS PANEL — manage admin accounts & roles
+    ════════════════════════════════════════ */
+    function renderUsers() {
+        var list = $('usersAdminList');
+        if (!list) return;
+        var users = getUsers();
+        var me    = getCurrentUser();
+        var isSuper = me.role === 'superadmin';
+
+        if (!users.length) { list.innerHTML = '<p class="empty-state">No users yet.</p>'; return; }
+
+        list.innerHTML = users.map(function (u) {
+            var role = ROLES[u.role] ? ROLES[u.role] : ROLES.viewer;
+            var isMe = u.user === me.user;
+            var actions = '';
+            if (isSuper && !isMe) {
+                actions = '<button class="btn-sm btn-icon btn-outline" data-action="edit" data-name="' + escHtml(u.user) + '" title="Edit">'
+                    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
+                    + '</button>'
+                    + '<button class="btn-sm btn-icon btn-delete" data-action="delete" data-name="' + escHtml(u.user) + '" title="Delete">'
+                    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>'
+                    + '</button>';
+            }
+            return '<div class="project-admin-card user-card" data-name="' + escHtml(u.user) + '">'
+                + '<div class="project-admin-info">'
+                + '<h4>' + escHtml(u.user) + (isMe ? ' <span class="you-badge">you</span>' : '') + '</h4>'
+                + '<p>' + formatDate(u.created) + '</p>'
+                + '</div>'
+                + '<span class="project-admin-cat role-' + u.role + '">' + role.label + '</span>'
+                + (actions ? '<div class="project-admin-actions">' + actions + '</div>' : '')
+                + '</div>';
+        }).join('');
+
+        list.onclick = function (e) {
+            var btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            var name = btn.dataset.name;
+            var act  = btn.dataset.action;
+            var users = getUsers();
+            var target = users.filter(function (u) { return u.user === name; })[0];
+            if (!target) return;
+
+            if (act === 'edit') {
+                $('uName').value        = target.user;
+                $('uName').disabled     = true;
+                $('uPass').value        = '';
+                $('uPass').placeholder  = 'Leave blank to keep current password';
+                $('uRole').value        = target.role;
+                $('uEditName').value    = target.user;
+                $('userFormTitle').textContent = 'Edit User';
+                $('saveUserBtn').textContent   = 'Update User';
+                $('userFormWrap').style.display = 'block';
+                $('userFormWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else if (act === 'delete') {
+                if (!confirm('Delete user "' + name + '"? This cannot be undone.')) return;
+                if (target.role === 'superadmin' && users.filter(function (u) { return u.role === 'superadmin'; }).length <= 1) {
+                    showToast('Cannot delete the last super admin.', 'err');
+                    return;
+                }
+                saveUsers(users.filter(function (u) { return u.user !== name; }));
+                renderUsers();
+                showToast('User deleted.');
+            }
+        };
+    }
+
+    var addUserBtn = $('addUserBtn');
+    if (addUserBtn) {
+        addUserBtn.addEventListener('click', function () {
+            $('userForm').reset();
+            $('uName').disabled    = false;
+            $('uPass').placeholder = '';
+            $('uEditName').value   = '';
+            $('userFormTitle').textContent = 'Add New User';
+            $('saveUserBtn').textContent   = 'Save User';
+            $('userFormWrap').style.display = $('userFormWrap').style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    var cancelUserBtn = $('cancelUserBtn');
+    if (cancelUserBtn) {
+        cancelUserBtn.addEventListener('click', function () {
+            $('userFormWrap').style.display = 'none';
+            $('userForm').reset();
+            $('uName').disabled = false;
+        });
+    }
+
+    var userForm = $('userForm');
+    if (userForm) {
+        userForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var users = getUsers();
+            var editName = $('uEditName').value.trim();
+            var name = $('uName').value.trim();
+            var pass = $('uPass').value;
+            var role = $('uRole').value;
+
+            if (users.filter(function (u) { return u.user === name; }).length && !editName) {
+                showToast('A user with that username already exists.', 'err');
+                return;
+            }
+
+            if (editName) {
+                var idx = -1;
+                users.forEach(function (u, i) { if (u.user === editName) idx = i; });
+                if (idx > -1) {
+                    users[idx].role = role;
+                    if (pass) users[idx].pass = btoa(pass);
+                }
+            } else {
+                if (!pass) { showToast('Password is required.', 'err'); return; }
+                users.push({ user: name, pass: btoa(pass), role: role, created: Date.now() });
+            }
+
+            saveUsers(users);
+            renderUsers();
+            $('userFormWrap').style.display = 'none';
+            userForm.reset();
+            $('uName').disabled = false;
+            showToast(editName ? 'User updated.' : 'User added.');
+        });
+    }
+
+    /* ════════════════════════════════════════
        SETTINGS PANEL
     ════════════════════════════════════════ */
     function loadSettingsForm() {
@@ -572,9 +790,10 @@
             var next    = $('newPass').value;
             var confirm = $('confirmPass').value;
             var msg     = $('passMsg');
-            var stored  = load(KEYS.password, DEFAULT_PASS);
+            var users   = getUsers();
+            var me      = getCurrentUser();
 
-            if (btoa(current) !== stored) {
+            if (btoa(current) !== me.pass) {
                 msg.textContent = 'Current password is incorrect.';
                 msg.className   = 'settings-msg err';
                 return;
@@ -589,7 +808,8 @@
                 msg.className   = 'settings-msg err';
                 return;
             }
-            save(KEYS.password, btoa(next));
+            users.forEach(function (u, i) { if (u.user === me.user) users[i].pass = btoa(next); });
+            saveUsers(users);
             changePassForm.reset();
             msg.textContent = 'Password updated successfully!';
             msg.className   = 'settings-msg ok';
@@ -710,8 +930,10 @@
         loadSettingsForm();
         var mp = $('panel-messages');
         var pp = $('panel-projects');
+        var up = $('panel-users');
         if (mp && mp.classList.contains('active')) renderMessages();
         if (pp && pp.classList.contains('active')) renderProjects();
+        if (up && up.classList.contains('active')) renderUsers();
     }
 
     /* ════════════════════════════════════════

@@ -563,6 +563,77 @@ textarea { resize: vertical; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: var(--bg); }
 
+/* Journey cards */
+.journeys-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.journey-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.8rem;
+}
+
+.journey-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    margin-bottom: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.journey-ref {
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.journey-path {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+}
+
+.journey-stop {
+    background: var(--surface);
+    border: 1px solid var(--border-g);
+    color: var(--p);
+    padding: 0.1rem 0.5rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.7rem;
+}
+
+.journey-arrow { color: var(--text-3); font-size: 0.75rem; }
+
+/* Topbar user chip */
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.topbar-user-meta { display: flex; flex-direction: column; line-height: 1.15; }
+.topbar-user-meta strong { font-size: 0.82rem; }
+
+.role-badge {
+    align-self: flex-start;
+    background: #dcfce7;
+    color: var(--p);
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 0.1rem 0.5rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+[data-theme="dark"] .role-badge { background: #1a3a28; }
+
 /* ════════════════════════════════════════
    MESSAGES PANEL
 ════════════════════════════════════════ */
@@ -771,6 +842,24 @@ textarea { resize: vertical; }
 
 .upload-btn:hover { background: var(--p-dark); transform: translateY(-1px); }
 .upload-btn svg { width: 14px; height: 14px; }
+
+/* ── Users (roles) ── */
+.users-admin-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.you-badge {
+    background: var(--p);
+    color: white;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 0.08rem 0.5rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.role-superadmin { background: var(--purple-bg); color: var(--purple); border: 1px solid #c4b5fd; }
+.role-admin      { background: var(--blue-bg);   color: var(--blue);   border: 1px solid #93c5fd; }
+.role-viewer     { background: var(--orange-bg); color: var(--orange); border: 1px solid #fdba74; }
 
 /* ════════════════════════════════════════
    RESPONSIVE
