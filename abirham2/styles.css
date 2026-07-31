@@ -76,6 +76,12 @@ img { max-width: 100%; display: block; }
 a { text-decoration: none; }
 button { cursor: pointer; font-family: inherit; }
 
+:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -83,6 +89,8 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 section { padding: 5rem 0; }
+
+section[id] { scroll-margin-top: var(--nav-h); }
 
 /* ============================================
    SCROLL PROGRESS BAR
@@ -446,10 +454,12 @@ section { padding: 5rem 0; }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     border-radius: 8px;
     backdrop-filter: blur(2px);
-    color: rgba(134,239,172,0.8);
+    color: rgba(134,239,172,0.9);
 }
 
 .cube-face.front  { transform: translateZ(40px); }
@@ -601,17 +611,11 @@ section { padding: 5rem 0; }
     position: absolute;
     border-radius: 50%;
     background: rgba(255,255,255,0.04);
-    animation: floatShape 8s ease-in-out infinite;
 }
 
 .shape-1 { width: 400px; height: 400px; top: -100px; right: -80px; animation-delay: 0s; }
 .shape-2 { width: 250px; height: 250px; bottom: 60px; left: -60px; animation-delay: -3s; }
 .shape-3 { width: 160px; height: 160px; top: 40%; right: 20%; animation-delay: -5s; }
-
-@keyframes floatShape {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(10deg); }
-}
 
 .hero-content {
     display: flex;
@@ -1525,6 +1529,7 @@ section { padding: 5rem 0; }
     .nav-overlay { display: block; }
 
     .hero-content { flex-direction: column; text-align: center; gap: 2rem; padding: 2rem 0; }
+    .tech-cube-wrap { display: none; }
     .hero-description { margin: 0 auto 2rem; }
     .hero-title { font-size: 2.4rem; }
     .hero-roles { font-size: 1.1rem; justify-content: center; }
@@ -1551,4 +1556,16 @@ section { padding: 5rem 0; }
     .section-title { font-size: 1.75rem; }
     .contact-form-wrap { padding: 1.5rem; }
     .btn { padding: 0.65rem 1.35rem; font-size: 0.875rem; }
+}
+
+/* ============================================
+   ACCESSIBILITY — reduce motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

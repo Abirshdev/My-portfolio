@@ -19,6 +19,8 @@
     };
 
     /* ── helpers ── */
+    var IS_ADMIN_PAGE = /admin\.html/i.test(window.location.pathname.split('/').pop() || '');
+
     function load(key, fallback) {
         try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
         catch { return fallback; }
@@ -164,9 +166,14 @@
         },
 
         init() {
-            const { totalVisitors } = trackSession();
-            attachProjectListeners();
-            observeSections();
+            let totalVisitors = load(KEYS.visitors, 0);
+
+            /* Admin panel must read analytics without polluting the data. */
+            if (!IS_ADMIN_PAGE) {
+                totalVisitors = trackSession().totalVisitors;
+                attachProjectListeners();
+                observeSections();
+            }
 
             /* update hero visitor counter */
             const el = document.getElementById('visitorCount');

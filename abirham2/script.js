@@ -73,6 +73,12 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    /* ════════════════════════════════════════
+       FOOTER YEAR
+    ════════════════════════════════════════ */
+    var footerYear = document.getElementById('footerYear');
+    if (footerYear) footerYear.textContent = new Date().getFullYear();
+
     /* ── scroll event (all scroll-dependent functions) ── */
     window.addEventListener('scroll', function () {
         if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 20);

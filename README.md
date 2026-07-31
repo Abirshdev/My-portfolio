@@ -1,19 +1,87 @@
-# My-portfolio
-My personal portfolio showcasing projects and skills
-# Abirshdev Portfolio
+# Abirham Demilew — Portfolio
 
-## About Me
-Computer Science student passionate about software development.
+A modern, responsive personal portfolio built with vanilla HTML, CSS, and JavaScript. It showcases my work as a Full Stack Developer specializing in the **MERN stack** (MongoDB, Express.js, React, Node.js).
 
-## Skills
-- Java, Flutter, Dart
-- Web Development (HTML, CSS, JavaScript)
+🔗 **Live site:** [my-portfolio-5amg.onrender.com](https://my-portfolio-5amg.onrender.com)
 
-## Projects
-1. Smart Campus App -
-2. portfolio
-3. smart patient queue managment system
+---
+
+## Features
+
+- 🎨 Green-branded, fully **dark mode** compatible design
+- ✨ Smooth scroll animations, 3D card tilts, and an animated rotating tech cube
+- ⌨️ Typing-effect hero roles and animated skill bars
+- 🗂️ Filterable project gallery with live demo & GitHub links
+- 📝 **EmailJS** powered contact form with offline fallback (saved locally)
+- 📊 Built-in **analytics engine** (localStorage) — visitors, page views, project clicks, section dwell time, traffic sources
+- 🔐 **Admin panel** (`admin.html`) — analytics dashboard, contact messages inbox, project manager, and settings
+
+## Tech Stack
+
+| Layer      | Technologies                                       |
+| ---------- | -------------------------------------------------- |
+| Frontend   | HTML5, CSS3, JavaScript (ES6+)                     |
+| Backend    | Node.js, Express.js (project examples)             |
+| Database   | MongoDB                                            |
+| Tooling    | Git, GitHub, Render, Vercel                        |
+| Services   | EmailJS, localStorage analytics                    |
+
+## Project Structure
+
+```
+My-portfolio/
+├── index.html        # Main portfolio page
+├── styles.css        # Portfolio styles + theming
+├── script.js         # UI interactions (theme, menu, filters, form)
+├── analytics.js      # Visitor analytics engine
+├── admin.html        # Admin panel
+├── admin.css         # Admin panel styles
+├── admin.js          # Admin logic (auth, analytics, messages, projects)
+├── profile.jpg       # Profile photo
+├── campuspc.jpg      # Campus PC project preview
+├── Abirsh CV.pdf     # Downloadable CV
+└── README.md
+```
+
+## Getting Started
+
+This is a static site — no build step required.
+
+```bash
+# Clone the repository
+git clone https://github.com/Abirshdev/My-portfolio.git
+
+# Serve locally (any static server works)
+cd My-portfolio/abirham2
+python -m http.server 8000
+# or
+npx serve .
+```
+
+Open `http://localhost:8000` in your browser.
+
+> The contact form uses **EmailJS**. To make it work with your own account, update the public key, service ID, and template ID in `script.js`.
+
+## Featured Projects
+
+| Project | Stack | Links |
+| ------- | ----- | ----- |
+| **Smart Hospital Queue Management** | MongoDB, Express, React, Node.js, Socket.IO | [Live](https://shqms.vercel.app) · [GitHub](https://github.com/Abirshdev/SHQMS) |
+| **Campus PC Entry & Exit Monitoring** | MongoDB, Express, Node.js | [Live](https://campuspcsystem.onrender.com) · [GitHub](https://github.com/Abirshdev/CampusPCSystem) |
+| **Smart Grocery** | React, Node.js, MongoDB | [Live](https://smart-grocery-phi.vercel.app/) · [GitHub](https://github.com/Abirshdev/SmartGrocery) |
+
+## Admin Panel
+
+Visit `admin.html` to access the dashboard.
+
+- **Default credentials:** `admin` / `admin123`
+- Manage analytics, read contact messages, add/edit/delete projects, and change your password from the **Settings** tab.
+
+> ⚠️ Change the default password after your first login. Analytics data is stored per-browser in `localStorage`.
 
 ## Contact
-- Email:abirshm3729@gmail.com
-- LinkedIn: [your-linkedin-profile](https://www.linkedin.com/in/abirham-demilew-68b690388?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
+
+- **Email:** [abirhamdemilew@gmail.com](mailto:abirhamdemilew@gmail.com)
+- **GitHub:** [Abirshdev](https://github.com/Abirshdev)
+- **LinkedIn:** [Abirham Demilew](https://www.linkedin.com/in/abirham-demilew-68b690388)
+- **Telegram:** [@Abi2013](https://t.me/Abi2013)
